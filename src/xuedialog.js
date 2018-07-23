@@ -43,9 +43,16 @@
         };
     };
     Xuedialog.prototype = {
+        updataOptions: function(options){
+            var that = this;
+            $.each(options, function(key, value){
+                that.defaultOptions[key] = value;
+            })
+            return this;
+        },
         // 创建各个部位
         createModal: function(){
-            return $('<div class="xshmodal"></div>'); 
+            return $('<div class="xshmodal">'); 
         },
         getModal: function(){
             return this.$modal; 
@@ -55,7 +62,7 @@
             return this;
         },
         createModalHeader: function(){
-            return $('<div class="xshmodal-header clear-float"></div>')
+            return $('<div class="xshmodal-header clear-float">');
         },
         getModalHeader: function(){
             return this.$modalHeader; 
@@ -65,7 +72,7 @@
             return this;
         },
         createModalHeaderTitle: function(){
-            return $('<div class="xshmodal-headER-title"></div>')
+            return $('<div class="xshmodal-header-title">');
         },
         getModalHeaderTitle: function(){
             return this.$modalHeaderTitle; 
@@ -74,6 +81,47 @@
             this.$modalHeaderTitle = $modalHeaderTitle;
             return this;
         },
+        createModalHeaderTitleText: function(){
+            return $('<h3></h3>');
+        },
+        getModalHeaderTitleText: function(){
+            return this.$modalHeaderTitleText; 
+        },
+        setModalHeaderTitleText: function($modalHeaderTitleText){
+            this.$modalHeaderTitleText = $modalHeaderTitleText;
+            return this;
+        },
+        updataHeaderTitleText: function(){
+            this.getModalHeaderTitleText().text( this.defaultOptions.title );
+            return this;
+        },
+        createModalButton: function(){
+            return $('<div class="xshmodal-button">');
+        },
+        getModalButton: function(){
+            return this.$ModalButton;
+        },
+        setModalButton: function( $ModalButton ){
+            this.$ModalButton = $ModalButton;
+            return this;
+        },
+        createModalButtonContainer: function( name ){
+            return $('<div class="xshmodal-button-box xshmodal-button-'+ name +'">');
+        },
+        createModalButtonMin: function(){
+            var $container = this.createModalButtonContainer( 'min' );
+            $( '<span>' ).appendTo( $container ).html( this.defaultOptions.closeIcon );
+            return $container;
+        },
+        getModalButtonMin: function(){
+            return this.$ModalButtonMin;
+        },
+        setModalButtonMin: function( $ModalButtonMin ){
+            this.$ModalButtonMin = $ModalButtonMin;
+            return this;
+        },
+
+
         // 追加class
         updataClass: function(){
             this.defaultOptions.cssClass && this.getModal().addClass(this.defaultOptions.cssClass);
@@ -82,28 +130,49 @@
             this.defaultOptions.position && this.getModal().addClass('default-position');
             return this;
         },
-        updataOptions: function(options){
-            var that = this;
-            $.each(options, function(key, value){
-                that.defaultOptions[key] = value;
-            })
+        // 更新内容
+        updata: function(){
+            this.updataClass();
+            this.updataHeaderTitleText();
             return this;
+        },
+        ModalModular: function(){
+            this.setModal( this.createModal() );
+            this.defaultOptions.header && this.setModalHeader( this.createModalHeader() );
+            this.setModalHeaderTitle( this.createModalHeaderTitle() );
+            this.setModalHeaderTitleText( this.createModalHeaderTitleText() );
+            this.setModalButton( this.createModalButton() );
+            this.setModalButtonMin( this.createModalButtonMin() );
         },
         // 初始化modal
         initModal: function(){
-            // 最外层
-            this.setModal(this.createModal()).updataClass();
-            // header
-            this.defaultOptions.header && this.setModalHeader( this.createModalHeader() );
 
-            $('body').append( this.$modal[0].outerHTML );
+            this.getModalButton().append( this.getModalButtonMin() );
+
+
+            this.getModalHeaderTitle().append( this.getModalHeaderTitleText() );
+
+            
+            this.getModalHeader().append( this.getModalHeaderTitle() );
+            this.getModalHeader().append( this.getModalButton() );
+
+
+            this.getModal().append( this.getModalHeader() );
+            $('body').append( this.getModal() );
+            return this;
+        },
+        show: function( options ){
+            // 优先处理参数
+            options && this.updataOptions(options);
+            this.ModalModular();
+            this.initModal();
+            this.updata();
             return this;
         },
         // 打开显示
         openBefore: function(){},
         open: function(options){
-            options && this.updataOptions(options);
-            this.initModal();
+            this.show( options );
             return this;
         },
         openAfter: function(){},

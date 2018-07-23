@@ -14,15 +14,15 @@
                 <h3>晚饭去二分二</h3>
             </div>
             <div class="xshmodal-button">
-                <div class="xshmodal-button-box xshmodal-button-closable">
-                    <span>&#215;</span>
-                </div>
-                <div class="xshmodal-button-box xshmodal-button-closable">
+                <div class="xshmodal-button-box xshmodal-button-min">
+                    <span>&#8722;</span>
+                </div>  
+                <div class="xshmodal-button-box xshmodal-button-max">
                     <span>&#164;</span>
                 </div>
                 <div class="xshmodal-button-box xshmodal-button-closable">
-                    <span>&#8722;</span>
-                </div>                
+                    <span>&#215;</span>
+                </div>           
             </div>
         </div>
         <div class="xshmodal-body">
@@ -34,7 +34,11 @@
 <script src="./src/xuedialog.js"></script>
 <script>
     var a = Xuedialog.open({
-        cssClass: 'a'
+        cssClass: 'a',
+        title: '421341234',
+        closable: true,
+        max: true,
+        min: true,
     });
 </script>
 </html>
