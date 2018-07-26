@@ -41,7 +41,12 @@
                 height: '100%'
             },
             template: {}
-        };
+        }
+        this.eventOptions = {
+            callBack: new Function(),
+            closeEventBefore: this.callBack,
+            closeEventAfter: this.callBack,
+        }
     };
     Xuedialog.prototype = {
         updataOptions: function(options){
@@ -165,7 +170,22 @@
             this.$ModalMessage = $ModalMessage;
             return this;
         },
-
+        createMessage: function(){
+            return this.defaultOptions.message;
+        },
+        setMessage: function( $message ){
+            this.$message = $message;
+            return this;
+        },
+        getMessage: function(){
+            return this.$message;
+        },
+        // 更新内容
+        updataMessage: function(){
+            console.log( this.defaultOptions.message );
+            this.getModalMessage().html( this.$message );
+            return this;
+        },
         // 追加class
         updataClass: function(){
             this.defaultOptions.cssClass && this.getModal().addClass(this.defaultOptions.cssClass);
@@ -178,6 +198,7 @@
         updata: function(){
             this.updataClass();
             this.updataHeaderTitleText();
+            this.updataMessage();
             return this;
         },
         ModalModular: function(){
@@ -192,6 +213,8 @@
 
             this.setModalBody( this.createModalBody() );
             this.setModalMessage( this.createModalMessage() );
+
+            this.setMessage( this.createMessage() );
         },
         // 初始化modal
         initModal: function(){
@@ -221,7 +244,6 @@
 
 
 
-
             this.getModalBody().append( this.getModalMessage() );
 
             this.getModal().append( this.getModalBody() );
@@ -239,16 +261,34 @@
             this.updata();
             return this;
         },
-        // 打开显示
+        // 处理函数
+        removeModal: function(){
+            this.getModal().remove();
+            return this;
+        },
+        // 事件
         openBefore: function(){},
         open: function(options){
             this.show( options );
             return this;
         },
         openAfter: function(){},
-        closeBefore: function(){},
-        close: function(){},
-        closeAfter: function(){},
+        
+        closeBefore: function( cb ){
+            this.closeBefore = cb;
+            return this;
+        },
+        close: function( ){
+            this.closeBefore();
+            this.removeModal();
+            this.closeAfter();
+            return this;
+        },
+        closeAfter: function( cb ){
+            this.closeAfter = cb;
+            return this;
+        },
+
         minBefore: function(){},
         min: function(){},
         minAfter: function(){},
