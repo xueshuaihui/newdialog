@@ -34,6 +34,7 @@
             backdrop: true,
             position: true,
             size: true,
+            message: '',
             ajax: {},
             iframe: {
                 width: '100%',
@@ -110,7 +111,7 @@
         },
         createModalButtonMin: function(){
             var $container = this.createModalButtonContainer( 'min' );
-            $( '<span>' ).appendTo( $container ).html( this.defaultOptions.closeIcon );
+            $( '<span>' ).appendTo( $container ).html( this.defaultOptions.minIcon );
             return $container;
         },
         getModalButtonMin: function(){
@@ -120,7 +121,50 @@
             this.$ModalButtonMin = $ModalButtonMin;
             return this;
         },
-
+        createModalButtonMax: function(){
+            var $container = this.createModalButtonContainer( 'max' );
+            $( '<span>' ).appendTo( $container ).html( this.defaultOptions.maxIcon );
+            return $container;
+        },
+        getModalButtonMax: function(){
+            return this.$ModalButtonMax;
+        },
+        setModalButtonMax: function( $ModalButtonMax ){
+            this.$ModalButtonMax = $ModalButtonMax;
+            return this;
+        },
+        createModalButtonClose: function(){
+            var $container = this.createModalButtonContainer( 'close' );
+            $( '<span>' ).appendTo( $container ).html( this.defaultOptions.closeIcon );
+            return $container;
+        },
+        getModalButtonClose: function(){
+            return this.$ModalButtonClose;
+        },
+        setModalButtonClose: function( $ModalButtonClose ){
+            this.$ModalButtonClose = $ModalButtonClose;
+            return this;
+        },
+        createModalBody: function(){
+            return $('<div class="xshmodal-body">');
+        },
+        getModalBody: function(){
+            return this.$ModalBody;
+        },
+        setModalBody: function( $ModalBody ){
+            this.$ModalBody = $ModalBody;
+            return this;
+        },
+        createModalMessage: function(){
+            return $('<div class="xshmodal-message">');
+        },
+        getModalMessage: function(){
+            return this.$ModalMessage;
+        },
+        setModalMessage: function($ModalMessage){
+            this.$ModalMessage = $ModalMessage;
+            return this;
+        },
 
         // 追加class
         updataClass: function(){
@@ -143,11 +187,18 @@
             this.setModalHeaderTitleText( this.createModalHeaderTitleText() );
             this.setModalButton( this.createModalButton() );
             this.setModalButtonMin( this.createModalButtonMin() );
+            this.setModalButtonClose( this.createModalButtonClose() );
+            this.setModalButtonMax( this.createModalButtonMax() );
+
+            this.setModalBody( this.createModalBody() );
+            this.setModalMessage( this.createModalMessage() );
         },
         // 初始化modal
         initModal: function(){
 
             this.getModalButton().append( this.getModalButtonMin() );
+            this.getModalButton().append( this.getModalButtonMax() );
+            this.getModalButton().append( this.getModalButtonClose() );
 
 
             this.getModalHeaderTitle().append( this.getModalHeaderTitleText() );
@@ -157,7 +208,26 @@
             this.getModalHeader().append( this.getModalButton() );
 
 
+
             this.getModal().append( this.getModalHeader() );
+
+
+
+
+
+
+
+
+
+
+
+
+            this.getModalBody().append( this.getModalMessage() );
+
+            this.getModal().append( this.getModalBody() );
+            
+
+
             $('body').append( this.getModal() );
             return this;
         },
