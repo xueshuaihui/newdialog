@@ -14,7 +14,7 @@
         root.Xuedialog = factory(root.jQuery);
     }
 })(this,function($){
-    var Xuedialog = function(){
+    var Xuedialog = function (){
         // 定义默认参数
         this.defaultOptions = {
             cssClass: '',
@@ -28,7 +28,7 @@
             closeIcon: '&#215;',
             maxIcon: '&#164;',
             minIcon: '&#8722;',
-            draggable: false,
+            draggable: true,
             animate: false,
             description: true,
             backdrop: true,
@@ -41,11 +41,6 @@
                 height: '100%'
             },
             template: {}
-        }
-        this.eventOptions = {
-            callBack: new Function(),
-            closeEventBefore: this.callBack,
-            closeEventAfter: this.callBack,
         }
     };
     Xuedialog.prototype = {
@@ -117,6 +112,10 @@
         createModalButtonMin: function(){
             var $container = this.createModalButtonContainer( 'min' );
             $( '<span>' ).appendTo( $container ).html( this.defaultOptions.minIcon );
+            var that = this;
+            $container.on('click', function(){
+                that.minModal();
+            })
             return $container;
         },
         getModalButtonMin: function(){
@@ -129,6 +128,10 @@
         createModalButtonMax: function(){
             var $container = this.createModalButtonContainer( 'max' );
             $( '<span>' ).appendTo( $container ).html( this.defaultOptions.maxIcon );
+            var that = this;
+            $container.on('click', function(){
+                that.maxModal();
+            })
             return $container;
         },
         getModalButtonMax: function(){
@@ -141,6 +144,10 @@
         createModalButtonClose: function(){
             var $container = this.createModalButtonContainer( 'close' );
             $( '<span>' ).appendTo( $container ).html( this.defaultOptions.closeIcon );
+            var that = this;
+            $container.on('click', function(){
+                that.removeModal();
+            })
             return $container;
         },
         getModalButtonClose: function(){
@@ -180,9 +187,19 @@
         getMessage: function(){
             return this.$message;
         },
+        createModalDialog: function () {
+            return $('<div class="modal-dialog"></div>');
+        },
+        getModalDialog: function () {
+            return this.$modalDialog;
+        },
+        setModalDialog: function ($modalDialog) {
+            this.$modalDialog = $modalDialog;
+
+            return this;
+        },
         // 更新内容
         updataMessage: function(){
-            console.log( this.defaultOptions.message );
             this.getModalMessage().html( this.$message );
             return this;
         },
@@ -192,6 +209,7 @@
             this.defaultOptions.size && this.getModal().addClass('default-size');
             this.defaultOptions.backdrop && this.getModal().addClass('default-backdrop');
             this.defaultOptions.position && this.getModal().addClass('default-position');
+
             return this;
         },
         // 更新内容
@@ -202,55 +220,48 @@
             return this;
         },
         ModalModular: function(){
-            this.setModal( this.createModal() );
-            this.defaultOptions.header && this.setModalHeader( this.createModalHeader() );
-            this.setModalHeaderTitle( this.createModalHeaderTitle() );
-            this.setModalHeaderTitleText( this.createModalHeaderTitleText() );
-            this.setModalButton( this.createModalButton() );
-            this.setModalButtonMin( this.createModalButtonMin() );
-            this.setModalButtonClose( this.createModalButtonClose() );
-            this.setModalButtonMax( this.createModalButtonMax() );
+            this.setModal( this.createModal() )
+            .defaultOptions.header && this.setModalHeader( this.createModalHeader() )
+            .setModalHeaderTitle( this.createModalHeaderTitle() )
+            .setModalHeaderTitleText( this.createModalHeaderTitleText() )
+            .setModalButton( this.createModalButton() )
+            .setModalButtonMin( this.createModalButtonMin() )
+            .setModalButtonClose( this.createModalButtonClose() )
+            .setModalButtonMax( this.createModalButtonMax() )
 
-            this.setModalBody( this.createModalBody() );
-            this.setModalMessage( this.createModalMessage() );
+            .setModalBody( this.createModalBody() )
+            .setModalMessage( this.createModalMessage() )
 
-            this.setMessage( this.createMessage() );
+            .setMessage( this.createMessage() )
+
+            .setModalDialog( this.createModalDialog() )
         },
         // 初始化modal
-        initModal: function(){
-
-            this.getModalButton().append( this.getModalButtonMin() );
-            this.getModalButton().append( this.getModalButtonMax() );
-            this.getModalButton().append( this.getModalButtonClose() );
-
-
-            this.getModalHeaderTitle().append( this.getModalHeaderTitleText() );
-
-            
-            this.getModalHeader().append( this.getModalHeaderTitle() );
-            this.getModalHeader().append( this.getModalButton() );
-
-
-
-            this.getModal().append( this.getModalHeader() );
-
-
-
-
-
-
-
-
-
-
-
+        initModalHead: function(){
+            var head  = this.defaultOptions.draggable ? this.getModalDialog().appendTo( this.getModalHeader() )  : this.getModalHeader();
+            head.append( this.getModalButton()
+                .append( this.getModalButtonMin() )
+                .append( this.getModalButtonMax() ) 
+                .append( this.getModalButtonClose() )
+            )
+            .append( this.getModalHeaderTitle()
+            .append( this.getModalHeaderTitleText() )
+                 );
+        },
+        initModalBody: function(){
             this.getModalBody().append( this.getModalMessage() );
+        },
+        initModal: function(){
+            this.initModalHead();
+            this.initModalBody();
 
-            this.getModal().append( this.getModalBody() );
-            
+            $('body').append( this.getModal()
+                .append( this.getModalHeader() )
+                .append( this.getModalBody() ) 
+            );
 
-
-            $('body').append( this.getModal() );
+            // 追加功能
+            this.makeModalDraggable();
             return this;
         },
         show: function( options ){
@@ -261,9 +272,65 @@
             this.updata();
             return this;
         },
+        // 功能处理
+        makeModalDraggable: function () {
+            /*获取DOM*/
+            var that = this;
+            var $modal = that.getModal();
+            var $dialog =  that.getModalDialog();
+            if( !this.defaultOptions.draggable )return;
+            $dialog.on('mousedown', {dialog: this}, function (event) {
+                event.stopPropagation();
+                $modal.addClass('xshmodal-dialog');
+                $dialog.data = {
+                    isMouseDown: true,
+                    mouseOffset: {
+                        top: event.offsetX,
+                        left: event.offsetY
+                    }
+                };
+                console.log( event )
+            });
+            this.getModal().on('mouseup', {dialog: this}, function (event) {
+                event.stopPropagation();
+                $dialog.data = {
+                    isMouseDown: false,
+                    mouseOffset: {
+                        top: null,
+                        left: null
+                    }
+                };
+            });
+            $('body').on('mousemove', {dialog: this}, function (event) {
+                event.stopPropagation();
+                if( !$dialog.data.isMouseDown )return;
+                // $modal.offset({
+                //     top: event.clientY + $dialog.data.mouseOffset.top,
+                //     left: event.clientX + $dialog.data.mouseOffset.left
+                // });
+                $modal.offset({
+                    top: event.clientY,
+                    left: event.clientX
+                });
+            });
+
+            return this;
+        },
         // 处理函数
         removeModal: function(){
-            this.getModal().remove();
+            this.$modal.remove();
+            return this;
+        },
+        minModal: function(){
+            var $modal = this.getModal();
+            $modal.removeClass( 'maxmodal' );
+            $modal.toggleClass( 'minmodal' );
+            return this;
+        },
+        maxModal: function(){
+            var $modal = this.getModal();
+            $modal.removeClass( 'minmodal' );
+            $modal.toggleClass( 'maxmodal' );
             return this;
         },
         // 事件
@@ -278,23 +345,36 @@
             this.closeBefore = cb;
             return this;
         },
-        close: function( ){
+        closeAfter: function( cb ){
+            this.closeAfter = cb;
+            return this;
+        },
+        close: function(){
             this.closeBefore();
             this.removeModal();
             this.closeAfter();
             return this;
         },
-        closeAfter: function( cb ){
-            this.closeAfter = cb;
+        
+
+        minBefore: function( cb ){
+            this.minBefore = cb;
             return this;
         },
+        minAfter: function( cb ){
+            this.minAfter = cb;
+            return this;
+        },
+        min: function(){
+            this.minBefore();
 
-        minBefore: function(){},
-        min: function(){},
-        minAfter: function(){},
+
+            this.minAfter();
+            return this;
+        },
         maxBefore: function(){},
         max: function(){},
         maxAfter: function(){}
-    }
-    return new Xuedialog();
+    };
+    return  Xuedialog;
 });
