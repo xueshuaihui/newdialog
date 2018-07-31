@@ -32,7 +32,8 @@
             description: true,
             backdrop: true,
             position: true,
-            size: true,
+            fixed: {},
+            size: false,
             message: '',
             ajax: null,
             iframe: null,
@@ -270,6 +271,7 @@
             this.defaultOptions.ajax && this.ajax();
             this.defaultOptions.iframe && this.iframe();
             this.defaultOptions.template && this.template();
+            return this;
         },
         // 追加class
         updataClass: function(){
@@ -311,6 +313,12 @@
             .setModalDialog( this.createModalDialog() )
             return this;
         },
+        // 更新位置
+        fixed: function(){
+            this.$fixed = this.defaultOptions.fixed;
+             this.getModal().css( this.$fixed );
+             return this;
+        },
         // 初始化modal
         initModalHead: function(){
             this.getModalHeader().append( this.getModalButton()
@@ -347,7 +355,8 @@
             this.ModalModular()
             .initModal()
             .updata()
-            .updataAsynMessage();
+            .updataAsynMessage()
+            .fixed()
             return this;
         },
         // 功能处理
