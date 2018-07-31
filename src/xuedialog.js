@@ -21,26 +21,22 @@
             title: null,
             message: null,
             header: true,
-            headerContent: '',
-            closable: false,
-            max: false,
-            min: false,
+            closable: true,
+            max: true,
+            min: true,
             closeIcon: '&#215;',
             maxIcon: '&#164;',
             minIcon: '&#8722;',
-            draggable: true,
+            draggable: false,
             animate: false,
             description: true,
             backdrop: true,
             position: true,
             size: true,
             message: '',
-            ajax: {},
-            iframe: {
-                width: '100%',
-                height: '100%'
-            },
-            template: {}
+            ajax: null,
+            iframe: null,
+            template: null
         }
     };
     Xuedialog.prototype = {
@@ -198,10 +194,82 @@
 
             return this;
         },
-        // 更新内容
+
+
+        // 是否显示
+        isHeader: function(){
+            return this.defaultOptions.header;
+        },
+        isClosable: function(){
+            return this.defaultOptions.closable;
+        },
+        isMax: function(){
+            return this.defaultOptions.max;
+        },
+        isMin: function(){
+            return this.defaultOptions.min;
+        },
+        // message
+        ajax: function(){
+            var options = this.defaultOptions.ajax; 
+            if( !options.url  )return;
+            var that = this;
+            $.ajax({
+                url: options.url,
+                type: options.type || 'get',
+                data: options.data || {},
+                success: function( data ){
+                    that.setMessage( data );
+                    that.updataMessage();
+                    options.success && options.success() 
+                }
+            })
+            return this;
+        },
+        iframe: function(){
+            var options = this.defaultOptions.iframe; 
+            // 默认处理iframe的行内参数
+            var src = options.src || options.url || '';
+            if( !options.url  )return;
+            var width = options.width || '100%';
+            var height = options.height || '100%';
+            var name = options.name || src;
+            var message = '<iframe src="http://www.runoob.com" width="'+ width +'" height="'+ height +'" name="'+ name +'"></iframe>';
+            this.setMessage( message );
+            this.updataMessage();
+            return this;
+        },
+        template: function(){
+            var options = this.defaultOptions.template; 
+            if( !( options.url && options.data )  )return;
+            var that = this;
+            var templateStr = null;
+            var templateData = null;
+            $.get( options.url, function( content ){
+                templateStr = content;
+                templateData && getHtml( templateStr, templateData );
+            })
+            $.get( options.data, function( content ){
+                templateData = content;
+                templateStr && getHtml( templateStr, templateData );
+            })
+            var getHtml = function( templateStr, templateData ){
+                var htmlTemplate = template.render( templateStr, templateData );
+                that.setMessage( htmlTemplate );
+                that.updataMessage();
+            }
+            return this;
+        },
+        // 同步更新message内容
         updataMessage: function(){
             this.getModalMessage().html( this.$message );
             return this;
+        },
+        // 异步更新message
+        updataAsynMessage: function(){
+            this.defaultOptions.ajax && this.ajax();
+            this.defaultOptions.iframe && this.iframe();
+            this.defaultOptions.template && this.template();
         },
         // 追加class
         updataClass: function(){
@@ -210,18 +278,24 @@
             this.defaultOptions.backdrop && this.getModal().addClass('default-backdrop');
             this.defaultOptions.position && this.getModal().addClass('default-position');
 
+            // 显隐
+            this.isHeader() || this.getModalHeader().addClass('hide');
+            this.isClosable() || this.getModalButtonClose().addClass('hide');
+            this.isMin() || this.getModalButtonMin().addClass('hide');
+            this.isMax() || this.getModalButtonMax().addClass('hide');
+
             return this;
         },
         // 更新内容
         updata: function(){
-            this.updataClass();
-            this.updataHeaderTitleText();
-            this.updataMessage();
+            this.updataClass()
+            .updataHeaderTitleText()
+            .updataMessage();
             return this;
         },
         ModalModular: function(){
             this.setModal( this.createModal() )
-            .defaultOptions.header && this.setModalHeader( this.createModalHeader() )
+            this.setModalHeader( this.createModalHeader() )
             .setModalHeaderTitle( this.createModalHeaderTitle() )
             .setModalHeaderTitleText( this.createModalHeaderTitleText() )
             .setModalButton( this.createModalButton() )
@@ -239,13 +313,13 @@
         },
         // 初始化modal
         initModalHead: function(){
-            var head  = this.defaultOptions.draggable ? this.getModalDialog().appendTo( this.getModalHeader() )  : this.getModalHeader();
-            head.append( this.getModalButton()
+            this.getModalHeader().append( this.getModalButton()
                 .append( this.getModalButtonMin() )
                 .append( this.getModalButtonMax() ) 
                 .append( this.getModalButtonClose() )
             )
-            .append( this.getModalHeaderTitle()
+            var head  = this.defaultOptions.draggable ? this.getModalDialog().appendTo( this.getModalHeader() )  : this.getModalHeader();
+            head.append( this.getModalHeaderTitle()
             .append( this.getModalHeaderTitleText() )
                  );
             return this;
@@ -273,6 +347,7 @@
             this.ModalModular()
             .initModal()
             .updata()
+            .updataAsynMessage();
             return this;
         },
         // 功能处理
@@ -292,7 +367,7 @@
                     }
                 };
             });
-            this.getModal().on('mouseup', {dialog: this}, function (event) {
+            $(window).on('mouseup', {dialog: this}, function (event) {
                 event.stopPropagation();
                 $dialog.data = {
                     isMouseDown: false,
@@ -316,7 +391,11 @@
         },
         // 处理函数
         removeModal: function(){
+            console.log( this.closeBefore )
+            this.closeBefore && this.closeBefore();
             this.$modal.remove();
+            this.close && this.close();
+            this.closeAfter && this.closeAfter();
             return this;
         },
         minModal: function(){
@@ -340,21 +419,21 @@
         openAfter: function(){},
         
         closeBefore: function( cb ){
-            this.closeBefore = cb;
+            this.closeBefore = cb ? cb : false;
             return this;
         },
         closeAfter: function( cb ){
-            this.closeAfter = cb;
+            this.closeAfter = cb ? cb : false;
             return this;
         },
-        close: function(){
-            this.closeBefore();
-            this.removeModal();
-            this.closeAfter();
+        close: function( cb ){
+            if( cb ){
+                this.close = cb
+            }else {
+                this.removeModal();
+            }
             return this;
         },
-        
-
         minBefore: function( cb ){
             this.minBefore = cb;
             return this;
@@ -365,8 +444,6 @@
         },
         min: function(){
             this.minBefore();
-
-
             this.minAfter();
             return this;
         },

@@ -31,26 +31,31 @@
     </div> -->
 </body>
 <script src="./src/jquery-3.1.1.min.js"></script>
+<script src="./js/template-web.js"></script>
 <script src="./src/xuedialog.js"></script>
 <script>
-    var a = new Xuedialog().open({
+    // var a = new Xuedialog().open({
+    //     cssClass: 'a',
+    //     header: false,
+    //     title: '身高多',
+    //     closable: false,
+    //     max: false,
+    //     min: false,
+    //     draggable: true,
+    //     message: 'hello word',
+    // });
+    var b = new Xuedialog().open({
         cssClass: 'a',
-        title: '身高多',
+        title: 'iframe',
         closable: true,
         max: true,
         min: true,
-        message: 'hello word',
-        
-        
-    });
-    // var b = new Xuedialog().open({
-    //     cssClass: 'a',
-    //     title: '4144',
-    //     closable: true,
-    //     max: true,
-    //     min: true,
-    //     message: '214123413513'
-    // });  
+        draggable: true,
+        template: {
+            url: './test/test.html',
+            data: './data/data.json'
+        }
+    });  
 
 </script>
 </html>

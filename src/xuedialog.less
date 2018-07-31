@@ -15,6 +15,11 @@
 // xuedialog
 .xshmodal {
     position: fixed;
+    // 影藏 display: node
+    .hide {
+        display: none;
+    }
+
     &.default-size {
         // 默认大小
         width: @definedWidth;
@@ -106,8 +111,11 @@
         }
     }
     .xshmodal-body {
+        width: 100%;
+        height: 100%;
         .xshmodal-message {
-            
+            width: 100%;
+            height: 100%;
         }
     }
 }
