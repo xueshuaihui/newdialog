@@ -391,23 +391,25 @@
         },
         // 处理函数
         removeModal: function(){
-            console.log( this.closeBefore )
             this.closeBefore && this.closeBefore();
             this.$modal.remove();
-            this.close && this.close();
             this.closeAfter && this.closeAfter();
             return this;
         },
         minModal: function(){
+            this.minBefore && this.minBefore();
             var $modal = this.getModal();
             $modal.removeClass( 'maxmodal' );
             $modal.toggleClass( 'minmodal' );
+            this.minAfter && this.minAfter();
             return this;
         },
         maxModal: function(){
+            this.maxBefore && this.maxBefore();
             var $modal = this.getModal();
             $modal.removeClass( 'minmodal' );
             $modal.toggleClass( 'maxmodal' );
+            this.maxAfter && this.maxAfter();
             return this;
         },
         // 事件
@@ -427,11 +429,8 @@
             return this;
         },
         close: function( cb ){
-            if( cb ){
-                this.close = cb
-            }else {
-                this.removeModal();
-            }
+            cb && cb();
+            this.removeModal();
             return this;
         },
         minBefore: function( cb ){
@@ -442,14 +441,24 @@
             this.minAfter = cb;
             return this;
         },
-        min: function(){
-            this.minBefore();
-            this.minAfter();
+        min: function( cb ){
+            cb && cb();
+            this.minModal();
             return this;
         },
-        maxBefore: function(){},
-        max: function(){},
-        maxAfter: function(){}
+        maxBefore: function( cb ){
+            this.maxBefore = cb;
+            return this;
+        },
+        max: function( cb ){
+            cb && cb();
+            this.maxModal();
+            return this;
+        },
+        maxAfter: function( cb ){
+            this.maxAfter = cb;
+            return this;
+        }
     };
     return  Xuedialog;
 });
