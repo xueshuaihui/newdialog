@@ -235,6 +235,7 @@
             .setMessage( this.createMessage() )
 
             .setModalDialog( this.createModalDialog() )
+            return this;
         },
         // 初始化modal
         initModalHead: function(){
@@ -247,9 +248,11 @@
             .append( this.getModalHeaderTitle()
             .append( this.getModalHeaderTitleText() )
                  );
+            return this;
         },
         initModalBody: function(){
             this.getModalBody().append( this.getModalMessage() );
+            return this;
         },
         initModal: function(){
             this.initModalHead();
@@ -267,9 +270,9 @@
         show: function( options ){
             // 优先处理参数
             options && this.updataOptions(options);
-            this.ModalModular();
-            this.initModal();
-            this.updata();
+            this.ModalModular()
+            .initModal()
+            .updata()
             return this;
         },
         // 功能处理
@@ -281,15 +284,13 @@
             if( !this.defaultOptions.draggable )return;
             $dialog.on('mousedown', {dialog: this}, function (event) {
                 event.stopPropagation();
-                $modal.addClass('xshmodal-dialog');
                 $dialog.data = {
                     isMouseDown: true,
                     mouseOffset: {
-                        top: event.offsetX,
-                        left: event.offsetY
+                        top: event.offsetY,
+                        left: event.offsetX
                     }
                 };
-                console.log( event )
             });
             this.getModal().on('mouseup', {dialog: this}, function (event) {
                 event.stopPropagation();
@@ -304,14 +305,11 @@
             $('body').on('mousemove', {dialog: this}, function (event) {
                 event.stopPropagation();
                 if( !$dialog.data.isMouseDown )return;
-                // $modal.offset({
-                //     top: event.clientY + $dialog.data.mouseOffset.top,
-                //     left: event.clientX + $dialog.data.mouseOffset.left
-                // });
                 $modal.offset({
-                    top: event.clientY,
-                    left: event.clientX
+                    top: event.clientY - $dialog.data.mouseOffset.top,
+                    left: event.clientX - $dialog.data.mouseOffset.left
                 });
+                $modal.addClass('xshmodal-dialog');
             });
 
             return this;

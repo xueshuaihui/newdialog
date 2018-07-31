@@ -1,5 +1,9 @@
 // out: ./xuedialog.css, compress: true, sourceMap: false
 @import url('./reset.less');
+@definedWidth: 500px;
+@definedHeight: 500px;
+
+
 // 清浮动
 .clear-float {
     &:after {
@@ -13,8 +17,8 @@
     position: fixed;
     &.default-size {
         // 默认大小
-        width: 500px;
-        height: 500px;
+        width: @definedWidth;
+        height: @definedHeight;
     }
     &.default-backdrop {
         // 默认背景
@@ -22,54 +26,54 @@
     }
     &.default-position {
         // 默认位置
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        -moz-transform: translate(-50%, -50%);
-        -webkit-transform: translate(-50%, -50%);
-        -o-transform: translate(-50%, -50%);
+        top: calc( ~' ( 100% - @{definedWidth} ) / 2 ' );
+        left: calc( ~' ( 100% - @{definedHeight} ) / 2 ' );
+        // transform: translate(-50%, -50%);
+        // -ms-transform: translate(-50%, -50%);
+        // -moz-transform: translate(-50%, -50%);
+        // -webkit-transform: translate(-50%, -50%);
+        // -o-transform: translate(-50%, -50%);
     }
     // 拖动的时候
     &.xshmodal-dialog {
-        transform: translate(0, 0);
-        -ms-transform: translate(0, 0);
-        -moz-transform: translate(0, 0);
-        -webkit-transform: translate(0, 0);
-        -o-transform: translate(0, 0);
+        // transform: translate(0, 0);
+        // -ms-transform: translate(0, 0);
+        // -moz-transform: translate(0, 0);
+        // -webkit-transform: translate(0, 0);
+        // -o-transform: translate(0, 0);
     }
     // 放大
     &.maxmodal {
         width: 100%!important;
         height: 100%!important;
-        left: auto;
-        top: auto;
-        right: auto;
-        bottom: auto;
-        transform: translate(0, 0);
-        -ms-transform: translate(0, 0);
-        -moz-transform: translate(0, 0);
-        -webkit-transform: translate(0, 0);
-        -o-transform: translate(0, 0);
+        left: auto!important;
+        top: auto!important;
+        right: auto!important;
+        bottom: auto!important;
+        // transform: translate(0, 0);
+        // -ms-transform: translate(0, 0);
+        // -moz-transform: translate(0, 0);
+        // -webkit-transform: translate(0, 0);
+        // -o-transform: translate(0, 0);
     }
     // 缩小
     &.minmodal {
         width: 130px!important;
         height: 30px!important;
-        overflow: hidden;
-        position: relative;
-        top: calc( ~' 100% - 30px ' );
-        bottom: 0;
-        right: auto;
-        left: auto;
-        float: left;
-        transform: translate(0, 0);
-        -ms-transform: translate(0, 0);
-        -moz-transform: translate(0, 0);
-        -webkit-transform: translate(0, 0);
-        -o-transform: translate(0, 0);
-        text-align: left;
-        margin: 0 8px;
+        overflow: hidden!important;
+        position: relative!important;
+        top: calc( ~' 100% - 30px ' )!important;
+        bottom: 0!important;
+        right: auto!important;
+        left: auto!important;
+        float: left!important;
+        // transform: translate(0, 0);
+        // -ms-transform: translate(0, 0);
+        // -moz-transform: translate(0, 0);
+        // -webkit-transform: translate(0, 0);
+        // -o-transform: translate(0, 0);
+        text-align: left!important;
+        margin: 0 8px!important;
     }
     // 头部
     .xshmodal-header {
